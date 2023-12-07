@@ -73,6 +73,7 @@ module worker './app/worker.bicep' = {
     containerRegistryName: appEnv.outputs.registryName
     serviceName: workerServiceName
     managedIdentityName: security.outputs.managedIdentityName
+    orderProcessingServiceAppName: api.outputs.SERVICE_API_NAME
   }
 }
 
@@ -88,6 +89,18 @@ module api './app/api.bicep' = {
     containerRegistryName: appEnv.outputs.registryName
     serviceName: apiServiceName
     managedIdentityName: security.outputs.managedIdentityName
+  }
+}
+
+// Resiliency policy for API service
+module resiliency './core/resiliency/resiliency.bicep' = {
+  name: '${deployment().name}-resiliency-policies'
+  scope: rg
+  params: {
+    name: 'resiliency-policies'
+    location: location
+    tags: tags
+    containerAppName: api.outputs.SERVICE_API_NAME
   }
 }
 

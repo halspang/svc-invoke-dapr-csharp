@@ -7,6 +7,7 @@ param containerRegistryName string
 param imageName string = ''
 param serviceName string = 'checkout'
 param managedIdentityName string = ''
+param orderProcessingServiceAppName string = ''
 
 module app '../core/host/container-app-worker.bicep' = {
   name: '${serviceName}-container-app-module'
@@ -17,10 +18,16 @@ module app '../core/host/container-app-worker.bicep' = {
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerRegistryName: containerRegistryName
     imageName: !empty(imageName) ? imageName : 'nginx:latest'
-    daprEnabled: true
+    daprEnabled: false
     containerName: serviceName
     managedIdentityName: managedIdentityName
     managedIdentityEnabled: true
+    env: [
+      {
+        name: 'BASE_URL'
+        value: 'http://${orderProcessingServiceAppName}'
+      }
+    ]
   }
 }
 

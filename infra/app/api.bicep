@@ -7,6 +7,7 @@ param containerRegistryName string
 param imageName string = ''
 param serviceName string = 'order-processor'
 param managedIdentityName string = ''
+param failureRate string = '20'
 
 module app '../core/host/container-app.bicep' = {
   name: '${serviceName}-container-app-module'
@@ -19,11 +20,17 @@ module app '../core/host/container-app.bicep' = {
     containerCpuCoreCount: '1.0'
     containerMemory: '2.0Gi'
     imageName: !empty(imageName) ? imageName : 'nginx:latest'
-    daprEnabled: true
+    daprEnabled: false
     containerName: serviceName
     targetPort: 7001
     managedIdentityEnabled: true
     managedIdentityName: managedIdentityName
+    env: [
+      {
+        name: 'FAILURE_RATE'
+        value: failureRate
+      }
+    ]
   }
 }
 
